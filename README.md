@@ -2,6 +2,8 @@
 
 This library provides utility functions for handling JSON Web Tokens (JWT) for authentication purposes.
 
+---
+
 ## Functions
 
 ### `generateToken(accessTokenOptions, refreshTokenOptions)`
@@ -22,6 +24,8 @@ Generates an access token and optionally a refresh token.
 
 An object containing the generated access and refresh tokens, along with a status code.
 
+---
+
 ### `authenticate(token, secret)`
 
 Verifies a token using a secret.
@@ -34,6 +38,8 @@ Verifies a token using a secret.
 An object indicating whether the token is valid, the payload if valid, and a status code. If invalid, it includes an
 error message.
 
+---
+
 ### `isTokenRevoked(token)`
 
 Checks if a token has been revoked.
@@ -44,6 +50,8 @@ Checks if a token has been revoked.
 
 A boolean indicating whether the token has been revoked.
 
+---
+
 ### `revokeToken(token)`
 
 Revokes a token by adding it to the revoked tokens list.
@@ -53,6 +61,8 @@ Revokes a token by adding it to the revoked tokens list.
 #### Returns
 
 Nothing.
+
+---
 
 ### `refreshToken(refreshToken, refreshSecret, accessTokenOptions, newRefreshTokenOptions)`
 
@@ -67,6 +77,8 @@ token.
 #### Returns
 
 An object containing the newly generated access and refresh tokens, along with a status code.
+
+---
 
 ## Dependencies
 
