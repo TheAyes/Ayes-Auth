@@ -88,14 +88,12 @@ export const authenticate = (token: string, secret: string): AuthenticateResult 
 const revokedTokens: Set<string> = new Set();
 
 // Function to revoke token
-export const revokeToken = (token: string) => {
-	revokedTokens.add(token);
-};
+export const revokeToken = (token: string) => revokedTokens.add(token);
+
 
 // Function to check if a token has been revoked
-export const isTokenRevoked = (token: string): boolean => {
-	return revokedTokens.has(token);
-};
+export const isTokenRevoked = (token: string): boolean => revokedTokens.has(token);
+
 
 type RefreshTokenResult = AuthBaseType & {
 	accessToken?: string;
