@@ -60,9 +60,13 @@ type AuthenticateResult = AuthBaseType & {
 	isAuthenticated: boolean;
 	payload?: { [key: string]: any };
 };
-export const authenticate = (token: string, secret: string): AuthenticateResult => {
+export const authenticate = (token: {
+	accessToken: string,
+	refreshToken?: string,
+	status: number,
+}, secret: string): AuthenticateResult => {
 	try {
-		const payload = jwt.verify(token, secret);
+		const payload = jwt.verify(token.accessToken, secret);
 		return {
 			isAuthenticated: true,
 			payload: payload as { [key: string]: any },
