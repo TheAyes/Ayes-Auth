@@ -1,7 +1,7 @@
 {
 	"name": "ayes-auth",
 	"author": "Ayes",
-	"version": "1.0.0c",
+	"version": "1.0.1a",
 	"dependencies": {
 		"jsonwebtoken": "^9.0.0",
 		"dotenv": "^16.1.4"

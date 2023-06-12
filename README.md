@@ -1,4 +1,4 @@
-# JWT Authentication Library
+# Ayes' Authentication Library
 
 This library provides utility functions for handling JSON Web Tokens (JWT) for authentication purposes.
 
