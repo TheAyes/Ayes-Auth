@@ -1,4 +1,4 @@
-# JWT Authentication Utility
+# JWT Authorize
 
 This utility is a JavaScript module that provides functions to handle JSON Web Tokens (JWT) for authentication purposes.
 It is built using Node.js and utilizes the `jsonwebtoken` library.
