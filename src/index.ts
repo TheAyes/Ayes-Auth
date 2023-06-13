@@ -105,21 +105,12 @@ type RefreshTokenResult = AuthBaseType & {
 export const refreshToken = (
 	refreshToken: string,
 	refreshSecret: string,
-	accessTokenPayloadCallback: (payload: JwtPayload | string) => JwtPayload | string,
-	accessTokenOptions: {
-		payload: { [key: string]: any };
-		secret: string;
-		options?: SignOptions;
-	},
-	newRefreshTokenOptions?: {
-		payload: { [key: string]: any };
-		secret: string;
-		options?: SignOptions;
-	}
+	refreshTokenPayloadCallback: (payload: JwtPayload | string) => JwtPayload | string,
+	accessTokenInheritsFromRefreshToken: boolean,
 ): RefreshTokenResult => {
 	try {
 		// Verifying the refresh token
-		const tokenPayload = jwt.verify(refreshToken, refreshSecret);
+		const tokenPayload = jwt.verify(refreshToken, refreshSecret) as JwtPayload;
 
 		// Check if refresh token is revoked
 		if (isTokenRevoked(refreshToken)) {
@@ -129,24 +120,18 @@ export const refreshToken = (
 			};
 		}
 
-		const modifiedTokenPayload = accessTokenPayloadCallback(tokenPayload)
-
-		// Generating a new access token
-		const accessToken = jwt.sign(modifiedTokenPayload, accessTokenOptions.secret, accessTokenOptions.options);
-
-		// Optionally generating a new refresh token
-		let newRefreshToken;
-		if (newRefreshTokenOptions) {
-			newRefreshToken = jwt.sign(
-				newRefreshTokenOptions.payload,
-				newRefreshTokenOptions.secret,
-				newRefreshTokenOptions.options
-			);
+		let accessTokenPayload;
+		if (accessTokenInheritsFromRefreshToken) {
+			accessTokenPayload = refreshTokenPayloadCallback(tokenPayload);
+		} else {
+			accessTokenPayload = tokenPayload;
 		}
 
+		// Generating a new access token with the same secret as refresh token
+		const accessToken = jwt.sign(accessTokenPayload, refreshSecret);
+
 		return {
-			accessToken: accessToken,
-			refreshToken: newRefreshToken,
+			accessToken,
 			status: 200,
 		};
 	} catch (error: unknown) {
