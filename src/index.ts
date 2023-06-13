@@ -1,4 +1,4 @@
-import jwt, {JsonWebTokenError, SignOptions} from "jsonwebtoken";
+import jwt, {JsonWebTokenError, JwtPayload, SignOptions} from "jsonwebtoken";
 
 type AuthBaseType = {
 	status?: number;
@@ -61,9 +61,8 @@ type AuthenticateResult = AuthBaseType & {
 	payload?: { [key: string]: any };
 };
 export const authenticate = (token: {
-	accessToken: string,
-	refreshToken?: string,
-	status: number,
+	accessToken: string;
+	refreshToken?: string
 }, secret: string): AuthenticateResult => {
 	try {
 		const payload = jwt.verify(token.accessToken, secret);
@@ -106,6 +105,7 @@ type RefreshTokenResult = AuthBaseType & {
 export const refreshToken = (
 	refreshToken: string,
 	refreshSecret: string,
+	accessTokenPayloadCallback: (payload: JwtPayload | string) => JwtPayload | string,
 	accessTokenOptions: {
 		payload: { [key: string]: any };
 		secret: string;
@@ -119,9 +119,9 @@ export const refreshToken = (
 ): RefreshTokenResult => {
 	try {
 		// Verifying the refresh token
-		jwt.verify(refreshToken, refreshSecret);
+		const tokenPayload = jwt.verify(refreshToken, refreshSecret);
 
-		// Check if refresh token is revoked (You need to implement isTokenRevoked function)
+		// Check if refresh token is revoked
 		if (isTokenRevoked(refreshToken)) {
 			return {
 				error: "Refresh token is revoked",
@@ -129,8 +129,10 @@ export const refreshToken = (
 			};
 		}
 
+		const modifiedTokenPayload = accessTokenPayloadCallback(tokenPayload)
+
 		// Generating a new access token
-		const accessToken = jwt.sign(accessTokenOptions.payload, accessTokenOptions.secret, accessTokenOptions.options);
+		const accessToken = jwt.sign(modifiedTokenPayload, accessTokenOptions.secret, accessTokenOptions.options);
 
 		// Optionally generating a new refresh token
 		let newRefreshToken;

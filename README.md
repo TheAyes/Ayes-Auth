@@ -1,112 +1,129 @@
-# JWT Authorize
+# JWT Authentication Utility
 
-This library provides utility functions for handling JSON Web Tokens (JWT) for authentication purposes.
+This utility is a JavaScript module that provides functions to handle JSON Web Tokens (JWT) for authentication purposes.
+It is built using Node.js and utilizes the `jsonwebtoken` library.
 
----
+## Features
 
-## Functions
+1. **Token Generation**: Generate access and refresh tokens.
+2. **Token Authentication**: Authenticate a user by verifying their access token.
+3. **Token Revocation**: Revoke tokens by storing them in memory.
+4. **Token Refresh**: Generate a new access token using a refresh token.
 
-### `generateToken(accessTokenOptions, refreshTokenOptions)`
+## Installation
 
-Generates an access token and optionally a refresh token.
+This module has a dependency on the `jsonwebtoken` library. Make sure you have it installed in your project:
 
-- `accessTokenOptions`: An object containing the payload, secret, and options for the access token.
-	- `payload`: The payload of the token.
-	- `secret`: The secret used to sign the token.
-	- `options`: Optional. The signing options for the token.
+    npm install jsonwebtoken
 
-- `refreshTokenOptions`: An object containing the payload, secret, and options for the refresh token.
-	- `payload`: The payload of the token.
-	- `secret`: The secret used to sign the token.
-	- `options`: Optional. The signing options for the token.
+Then, import the utility module in your code:
 
-#### Returns
+    import {
+        generateToken,
+        authenticate,
+        revokeToken,
+        isTokenRevoked,
+        refreshToken
+    } from 'path-to-this-module';
 
-An object containing the generated access and refresh tokens, along with a status code.
+## API
 
----
+### generateToken(accessTokenOptions, refreshTokenOptions)
 
-### `authenticate(token, secret)`
+Generates an access token and, optionally, a refresh token.
 
-Verifies a token using a secret.
+- **accessTokenOptions**: Object containing payload, secret, and options for the access token.
+- **refreshTokenOptions**: Optional object containing payload, secret, and options for the refresh token.
 
-- `token`: The token to verify.
-- `secret`: The secret used to verify the token.
+Returns an object containing the access token, refresh token, and status code.
 
-#### Returns
+### authenticate(token, secret)
 
-An object indicating whether the token is valid, the payload if valid, and a status code. If invalid, it includes an
-error message.
+Authenticates a user by verifying their access token.
 
----
+- **token**: Object containing the access token and optional refresh token.
+- **secret**: Secret key used for verifying the access token.
 
-### `isTokenRevoked(token)`
+Returns an object containing the authentication status, payload, error message (if any), and status code.
+
+### revokeToken(token)
+
+Revokes a token by adding it to an in-memory store.
+
+- **token**: The token to be revoked.
+
+### isTokenRevoked(token)
 
 Checks if a token has been revoked.
 
-- `token`: The token to check.
+- **token**: The token to check.
 
-#### Returns
+Returns a boolean indicating whether the token is revoked.
 
-A boolean indicating whether the token has been revoked.
+### refreshToken(refreshToken, refreshSecret, accessTokenPayloadCallback, accessTokenOptions, newRefreshTokenOptions)
 
----
+Generates a new access token using a refresh token.
 
-### `revokeToken(token)`
+- **refreshToken**: The refresh token.
+- **refreshSecret**: Secret key used for verifying the refresh token.
+- **accessTokenPayloadCallback**: Callback function to manipulate the payload of the new access token.
+- **accessTokenOptions**: Object containing payload, secret, and options for the new access token.
+- **newRefreshTokenOptions**: Optional object containing payload, secret, and options for a new refresh token.
 
-Revokes a token by adding it to the revoked tokens list.
-
-- `token`: The token to revoke.
-
-#### Returns
-
-Nothing.
-
----
-
-### `refreshToken(refreshToken, refreshSecret, accessTokenOptions, newRefreshTokenOptions)`
-
-Refreshes a token by verifying the provided refresh token and generating a new access token and optionally a new refresh
-token.
-
-- `refreshToken`: The refresh token used for refreshing.
-- `refreshSecret`: The secret used to verify the refresh token.
-- `accessTokenOptions`: An object containing the payload, secret, and options for the new access token.
-- `newRefreshTokenOptions`: Optional. An object containing the payload, secret, and options for the new refresh token.
-
-#### Returns
-
-An object containing the newly generated access and refresh tokens, along with a status code.
-
----
-
-## Dependencies
-
-This library depends on the `jsonwebtoken` NPM package.
+Returns an object containing the new access token, optional new refresh token, and status code.
 
 ## Example Usage
 
-```javascript
-import { generateToken, authenticate, revokeToken, isTokenRevoked, refreshToken } from 'path-to-library';
+    import {
+        generateToken,
+        authenticate,
+        revokeToken,
+        isTokenRevoked,
+        refreshToken
+    } from 'path-to-this-module';
 
-const accessTokenOptions = {
-    payload: { userId: 1 },
-    secret: 'access-secret',
-    options: { expiresIn: '1h' }
-};
+    // Generate tokens
+    const tokens = generateToken(
+        {
+            payload: { userId: 1 },
+            secret: 'secretKey',
+            options: { expiresIn: '1h' }
+        },
+        {
+            payload: { userId: 1 },
+            secret: 'refreshSecretKey',
+            options: { expiresIn: '7d' }
+        }
+    );
 
-const refreshTokenOptions = {
-    payload: { userId: 1 },
-    secret: 'refresh-secret',
-    options: { expiresIn: '7d' }
-};
+    // Authenticate user
+    const authResult = authenticate(
+        { accessToken: tokens.accessToken },
+        'secretKey'
+    );
 
-const tokens = generateToken(accessTokenOptions, refreshTokenOptions);
+    // Revoke token
+    revokeToken(tokens.refreshToken);
 
-const authenticationResult = authenticate(tokens.accessToken, 'access-secret');
+    // Check if token is revoked
+    const isRevoked = isTokenRevoked(tokens.refreshToken);
 
-console.log(authenticationResult.isAuthenticated); // true
+    // Refresh token
+    const newTokens = refreshToken(
+        tokens.refreshToken,
+        'refreshSecretKey',
+        payload => payload,
+        {
+            payload: { userId: 1 },
+            secret: 'secretKey',
+            options: { expiresIn: '1h' }
+        }
+    );
 
-revokeToken(tokens.refreshToken);
+## Contributing
 
-console.log(isTokenRevoked(tokens.refreshToken)); // true
+Contributions, issues, and feature requests are welcome!
+
+## License
+
+This project is [MIT](https://opensource.org/licenses/MIT) licensed.
