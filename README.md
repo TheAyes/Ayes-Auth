@@ -1,129 +1,197 @@
-# JWT Authorize
+# 🚀 JWT Authorize - Secure Your Tokens! 🛡️
 
-This utility is a JavaScript module that provides functions to handle JSON Web Tokens (JWT) for authentication purposes.
-It is built using Node.js and utilizes the `jsonwebtoken` library.
+A powerful and easy-to-use library for handling JSON Web Tokens (JWT) in your Node.js applications. Be it generating,
+authenticating, refreshing, or managing tokens, JWT Authorize has got you covered! 🎩
 
-## Features
+## 🎁 What's inside
 
-1. **Token Generation**: Generate access and refresh tokens.
-2. **Token Authentication**: Authenticate a user by verifying their access token.
-3. **Token Revocation**: Revoke tokens by storing them in memory.
-4. **Token Refresh**: Generate a new access token using a refresh token.
+- 💪 Robust token generation
+- 🔐 Secure token authentication
+- 🔄 Easy token refreshing
+- ❌ Token revocation utilities
 
-## Installation
+# 📚 Table of Contents 📚
 
-This module has a dependency on the `jsonwebtoken` library. Make sure you have it installed in your project:
+1. 🎉 [Welcome to JWT Authorize!](#-jwt-authorize---secure-your-tokens-) 🎉
+2. 🛠️ [Function Guide](#-functions) 🛠️
+	1. 🚀 [generateToken](#-generatetoken) 🚀
+	2. 🛡️ [authenticate](#-authenticate) 🛡️
+	3. 🚫 [revokeToken](#-revoketoken) 🚫
+	4. 🚫🔢 [revokeManyTokens](#-revokemanytokens) 🚫🔢
+	5. ❓ [isTokenRevoked](#-istokenrevoked) ❓
+	6. 🔄 [refreshToken](#-refreshtoken) 🔄
+4. 📃 [License](#license) 📃
 
-    npm install jsonwebtoken
+## 🧰 Installation
 
-Then, import the utility module in your code:
+    npm install jwt-authorize
 
-    import {
-        generateToken,
-        authenticate,
-        revokeToken,
-        isTokenRevoked,
-        refreshToken
-    } from 'jwt-authorize';
+## 🧪 Functions
 
-## API
+### 🎟️ `generateToken`
 
-### generateToken(accessTokenOptions, refreshTokenOptions)
+Generates access and refresh tokens.
 
-Generates an access token and, optionally, a refresh token.
+#### Parameters
 
-- **accessTokenOptions**: Object containing payload, secret, and options for the access token.
-- **refreshTokenOptions**: Optional object containing payload, secret, and options for the refresh token.
+- `accessTokenOptions`: Object
+	- `payload`: Object - The data you want to encode in the access token.
+	- `secret`: String - The secret key for the access token.
+	- `options`: [SignOptions](https://www.npmjs.com/package/jsonwebtoken) - Optional JWT sign options.
+- `refreshTokenOptions`: Object (optional)
+	- `payload`: Object - The data you want to encode in the refresh token.
+	- `secret`: String - The secret key for the refresh token.
+	- `options`: [SignOptions](https://www.npmjs.com/package/jsonwebtoken) - Optional JWT sign options.
 
-Returns an object containing the access token, refresh token, and status code.
+#### Returns
 
-### authenticate(token, secret)
+- Object
+	- `accessToken`: String - The generated access token.
+	- `refreshToken`: String - The generated refresh token (if `refreshTokenOptions` were provided).
+	- `status`: Number - 200 if successful.
 
-Authenticates a user by verifying their access token.
+#### Example
 
-- **token**: Object containing the access token and optional refresh token.
-- **secret**: Secret key used for verifying the access token.
+    import { generateToken } from "jwt-authorize";
 
-Returns an object containing the authentication status, payload, error message (if any), and status code.
+    const tokens = generateToken(
+      {
+        payload: { username: "Alice" },
+        secret: "super-secret-key",
+        options: { expiresIn: '1h' },
+      },
+      {
+        payload: { username: "Alice" },
+        secret: "another-super-secret-key",
+        options: { expiresIn: '7d' },
+      }
+    );
 
-### revokeToken(token)
+    console.log(tokens); // { accessToken: "...", refreshToken: "...", status: 200 }
 
-Revokes a token by adding it to an in-memory store.
+---
 
-- **token**: The token to be revoked.
+### 🔒 `authenticate`
 
-### isTokenRevoked(token)
+Authenticates a user based on their access token.
+
+#### Parameters
+
+- `token`: Object
+	- `accessToken`: String - The access token to authenticate.
+	- `refreshToken`: String (optional) - The refresh token.
+- `secret`: String - The secret key to verify the token.
+
+#### Returns
+
+- Object
+	- `isAuthenticated`: Boolean - True if the token is valid, false otherwise.
+	- `payload`: Object - The decoded payload of the token if authenticated.
+	- `status`: Number - 200 if authenticated, 401 if not authenticated.
+
+#### Example
+
+    import { authenticate } from "jwt-authorize";
+
+    const result = authenticate(
+      {
+        accessToken: "your-access-token",
+      },
+      "your-secret-key"
+    );
+
+    console.log(result); // { isAuthenticated: true, payload: {...}, status: 200 }
+
+---
+
+### ❌ `revokeToken`
+
+Revokes a single token, so it can't be used again.
+
+#### Parameters
+
+- `token`: String - The token to revoke.
+
+#### Example
+
+    import { revokeToken } from "jwt-authorize";
+
+    revokeToken("your-token-to-revoke");
+
+---
+
+### ❌❌ `revokeManyTokens`
+
+Revokes multiple tokens at once.
+
+#### Parameters
+
+- `tokens`: Array of Strings - The tokens to revoke.
+
+#### Example
+
+    import { revokeManyTokens } from "jwt-authorize";
+
+    revokeManyTokens(["token-1", "token-2", "token-3"]);
+
+---
+
+### 🕵️ `isTokenRevoked`
 
 Checks if a token has been revoked.
 
-- **token**: The token to check.
+#### Parameters
 
-Returns a boolean indicating whether the token is revoked.
+- `token`: String - The token to check.
 
-### refreshToken(refreshToken, refreshSecret, accessTokenPayloadCallback, accessTokenOptions, newRefreshTokenOptions)
+#### Returns
 
-Generates a new access token using a refresh token.
+- Boolean - True if the token has been revoked, false otherwise.
 
-- **refreshToken**: The refresh token.
-- **refreshSecret**: Secret key used for verifying the refresh token.
-- **accessTokenPayloadCallback**: Callback function to manipulate the payload of the new access token.
-- **accessTokenOptions**: Object containing payload, secret, and options for the new access token.
-- **newRefreshTokenOptions**: Optional object containing payload, secret, and options for a new refresh token.
+#### Example
 
-Returns an object containing the new access token, optional new refresh token, and status code.
+    import { isTokenRevoked } from "jwt-authorize";
 
-## Example Usage
+    const revoked = isTokenRevoked("your-token");
 
-    import {
-        generateToken,
-        authenticate,
-        revokeToken,
-        isTokenRevoked,
-        refreshToken
-    } from 'path-to-this-module';
+    console.log(revoked); // true or false
 
-    // Generate tokens
-    const tokens = generateToken(
-        {
-            payload: { userId: 1 },
-            secret: 'secretKey',
-            options: { expiresIn: '1h' }
-        },
-        {
-            payload: { userId: 1 },
-            secret: 'refreshSecretKey',
-            options: { expiresIn: '7d' }
-        }
-    );
+---
 
-    // Authenticate user
-    const authResult = authenticate(
-        { accessToken: tokens.accessToken },
-        'secretKey'
-    );
+### 🔄 `refreshToken`
 
-    // Revoke token
-    revokeToken(tokens.refreshToken);
+Refreshes the access and refresh tokens. This is useful to get new tokens without asking the user for their credentials
+again.
 
-    // Check if token is revoked
-    const isRevoked = isTokenRevoked(tokens.refreshToken);
+#### Parameters
 
-    // Refresh token
+- `refreshToken`: String - The refresh token.
+- `refreshSecret`: String - The secret for the refresh token.
+- `accessTokenSecret`: String - The secret for the access token.
+- `accessTokenExpiry`: String (default = "15m") - The expiry duration for the access token.
+- `refreshTokenExpiry`: String (default = "7d") - The expiry duration for the refresh token.
+
+#### Returns
+
+- Object
+	- `accessToken`: String - The new access token.
+	- `refreshToken`: String - The new refresh token.
+	- `status`: Number - 200 if successful.
+
+#### Example
+
+    import { refreshToken } from "jwt-authorize";
+
     const newTokens = refreshToken(
-        tokens.refreshToken,
-        'refreshSecretKey',
-        payload => payload,
-        {
-            payload: { userId: 1 },
-            secret: 'secretKey',
-            options: { expiresIn: '1h' }
-        }
+      "your-old-refresh-token",
+      "refresh-secret",
+      "access-secret"
     );
 
-## Contributing
+    console.log(newTokens); // { accessToken: "...", refreshToken: "...", status: 200 }
 
-Contributions, issues, and feature requests are welcome!
+---
 
-## License
+## 📜 License
 
-This project is [MIT](https://opensource.org/licenses/MIT) licensed.
+This package is licensed under the [MIT](https://choosealicense.com/licenses/mit/) License.
