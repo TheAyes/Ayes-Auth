@@ -121,10 +121,10 @@ export const revokeToken = (token: string) => revokedTokens.add(token);
 
 /**
  * Revokes many tokens.
+ *
  * @param tokens - The array of tokens to revoke.
  */
 export const revokeManyTokens = (tokens: string[]) => tokens.forEach(token => revokedTokens.add(token));
-
 
 /**
  * Check if a token has been revoked.
