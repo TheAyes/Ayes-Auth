@@ -24,7 +24,7 @@ Then, import the utility module in your code:
         revokeToken,
         isTokenRevoked,
         refreshToken
-    } from 'path-to-this-module';
+    } from 'jwt-authorize';
 
 ## API
 
