@@ -119,6 +119,12 @@ const revokedTokens: Set<string> = new Set();
  */
 export const revokeToken = (token: string) => revokedTokens.add(token);
 
+/**
+ * Revokes many tokens.
+ * @param tokens - The array of tokens to revoke.
+ */
+export const revokeManyTokens = (tokens: string[]) => tokens.forEach(token => revokedTokens.add(token));
+
 
 /**
  * Check if a token has been revoked.
@@ -158,6 +164,8 @@ export const refreshToken = (
 		const newAccessToken = jwt.sign(payload, accessTokenSecret, {expiresIn: accessTokenExpiry});
 
 		const newRefreshToken = jwt.sign(payload, refreshSecret, {expiresIn: refreshTokenExpiry});
+
+		revokeToken(refreshToken);
 
 		return {
 			accessToken: newAccessToken,
